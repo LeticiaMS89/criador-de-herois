@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Criador de Heróis - RPG Interface</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body>
+
+    <div class="hud-top-bar left-status">
+        <div class="avatar-frame status-hero"></div>
+        <div class="bar-container">
+            <div class="hp-bar"></div>
+            <div class="mp-bar"></div>
+        </div>
+    </div>
+
+    <div class="hud-top-bar right-status">
+        <div class="bar-container">
+            <div class="hp-bar-enemy"></div>
+            <div class="xp-bar"></div>
+        </div>
+        <div class="avatar-frame enemy-frame"></div>
+    </div>
+
+    <div class="rpg-container">
+        
+        <header class="rpg-header">
+            <div class="joystick-icon-rpg"></div>
+            <div class="title-wrapper">
+                <h1>Criador de Heróis</h1>
+                <p>Painel de Controle de Combate</p>
+            </div>
+        </header>
+
+        <div class="panel-labels">
+            <span class="label-left">Dados do Herói</span>
+            <span class="label-right">Visualização & Batalha</span>
+        </div>
+
+        <div class="rpg-main-panel">
+            
+            <section class="panel-left">
+                <form id="hero-form">
+                    <div class="rpg-input-group">
+                        <label for="nome">Nome do Herói:</label>
+                        <input type="text" id="nome" placeholder="Ex: Arathorn" required>
+                    </div>
+
+                    <div class="rpg-input-row">
+                        <div class="rpg-input-group half-width">
+                            <label for="idade">Idade:</label>
+                            <input type="number" id="idade" value="25" required min="1">
+                        </div>
+                    </div>
+
+<div class="rpg-input-group">
+    <label for="tipo">Classe / Tipo:</label>
+    <select id="tipo" required>
+        <option value="" disabled selected>Escolha sua classe...</option>
+        
+        <option value="mago.png">🧙‍♂️ Mago Celestial</option>
+        <option value="guerreira.png">⚔️ Guerreira (Espadas Gêmeas)</option>
+        <option value="monge.png">🧘‍♂️ Monge Espiritual</option>
+        <option value="ninja.png">🥷 Ninja das Sombras</option>
+        
+    </select>
+</div>
+                    <button type="submit" class="btn-rpg-attack">Comandar Ataque</button>
+                </form>
+            </section>
+
+            <section class="panel-right">
+                <div class="character-preview-window">
+                    
+                    <div class="character-avatar-display" id="char-avatar">
+                        <div class="avatar-shadow"></div>
+                    </div>
+                    
+                    <div class="combat-log-box" id="result-box">
+                        <div class="log-header">Log de Combate</div>
+                        <p class="hero-stats-text"><span id="out-nome">Aventureiro</span>, <span id="out-idade">?</span> anos</p>
+                        <div class="battle-text-output">
+                            <p id="out-ataque">Aguardando ordens no painel de controle...</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </div>
+    </div>
+
+    <div class="orb life-orb"></div>
+    <div class="orb mana-orb"></div>
+
+    <script src="script.js"></script>
+</body>
+</html>
