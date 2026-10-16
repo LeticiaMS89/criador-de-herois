@@ -1,458 +1,553 @@
-/* =======================================================
-   TEMA REPRODUÇÃO DA INTERFACE RPG - VERSÃO REALISTA
-   ======================================================= */
+/**
+ * ===================================================================
+ * CRIADOR DE HERÓIS - INTERFACE RPG (DARK FANTASY HUD)
+ * ===================================================================
+ * 
+ * Estrutura do arquivo:
+ * 1. Design Tokens & Variáveis Globais (:root)
+ * 2. Reset Global & Normalização
+ * 3. Utilitários de Acessibilidade (.sr-only)
+ * 4. Estrutura Principal (Layout & Moldura de Ferro Envelhecido)
+ * 5. Cabeçalho HUD & Ícones CSS
+ * 6. Formulário & Inputs do Herói
+ * 7. Botão de Ataque (Forjado em Sangue)
+ * 8. Janela do Avatar & Ambientes das Classes
+ * 9. Log de Combate
+ * 10. Elementos HUD Flutuantes (Barras de Vida/Mana & Globos)
+ * 11. Responsividade & Media Queries
+ * 12. Preferências de Acessibilidade (Reduced Motion)
+ */
+
+/* ===================================================================
+   1. DESIGN TOKENS & VARIÁVEIS GLOBAIS (:ROOT)
+   =================================================================== */
+:root {
+  /* Paleta de Cores Tema Dark Fantasy / Horror */
+  --bg-deep-void: #050202;
+  --bg-panel-dark: #080404;
+  --bg-card-dark: #120a0a;
+
+  /* Metais e Molduras Envelhecidas */
+  --border-iron-dark: #1c1010;
+  --border-iron-light: #422828;
+  --border-frame: #2e1d1d;
+
+  /* Destaques Dourados e Carmesim */
+  --gold-primary: #bfa15f;
+  --gold-glow: rgba(191, 161, 95, 0.35);
+  --crimson-blood: #801414;
+  --crimson-bright: #b91c1c;
+  --crimson-glow: rgba(239, 68, 68, 0.5);
+
+  /* Texto e Tipografia */
+  --font-rpg: 'Cinzel', 'Georgia', serif;
+  --font-sans: 'Inter', system-ui, sans-serif;
+  --text-primary: #e2d7d7;
+  --text-muted: #8c7676;
+  --text-highlight: #fca5a5;
+
+  /* Efeitos e Sombras */
+  --shadow-panel: 0 0 40px rgba(0, 0, 0, 0.95), inset 0 0 25px rgba(0, 0, 0, 0.8);
+  --shadow-button: 0 5px 15px rgba(0, 0, 0, 0.6);
+  --transition-fast: all 0.2s ease;
+  --transition-normal: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+/* ===================================================================
+   2. RESET GLOBAL & NORMALIZAÇÃO
+   =================================================================== */
+
+/* 
+  CORREÇÃO CRÍTICA: Corrigido a sintaxe do reset de "- {" para o seletor universal "*".
+*/
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Cinzel', 'Georgia', serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
 body {
-    background-color: #050202;
-    background-image: radial-gradient(circle, #1a0606 0%, #030101 100%);
-    color: #e2d7d7;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    overflow: hidden;
-    position: relative;
+  background-color: var(--bg-deep-void);
+  background-image: radial-gradient(circle at center, #1a0606 0%, #030101 100%);
+  color: var(--text-primary);
+  font-family: var(--font-rpg);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  /* MELHORIA: Alterado de 'overflow: hidden' para permitir rolagem caso o conteúdo exceda a tela */
+  overflow-y: auto;
+  position: relative;
+  -webkit-font-smoothing: antialiased;
 }
 
-/* CONTAINER PRINCIPAL ESTILO MOLDURA METÁLICA ENVELHECIDA */
+/* ===================================================================
+   3. UTILITÁRIOS DE ACESSIBILIDADE (.SR-ONLY)
+   =================================================================== */
+
+/* Classe para ocultar elementos visualmente, mantendo-os acessíveis para leitores de tela */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ===================================================================
+   4. ESTRUTURA PRINCIPAL (MOLDURA METÁLICA ENVELHECIDA)
+   =================================================================== */
 .rpg-container {
-    background-color: #120a0a;
-    background-image: linear-gradient(135deg, #160d0d 0%, #0a0505 100%);
-    width: 100%;
-    max-width: 950px;
-    border: 4px solid #2e1d1d;
-    border-image: linear-gradient(to bottom, #422828, #1c1010) 1;
-    box-shadow: 0 0 40px rgba(0, 0, 0, 0.95), inset 0 0 25px rgba(0, 0, 0, 0.8);
-    padding: 25px;
-    position: relative;
-    z-index: 10;
+  background-color: var(--bg-card-dark);
+  background-image: linear-gradient(135deg, #160d0d 0%, #0a0505 100%);
+  width: 100%;
+  max-width: 950px;
+  border: 4px solid var(--border-frame);
+  border-image: linear-gradient(to bottom, var(--border-iron-light), var(--border-iron-dark)) 1;
+  box-shadow: var(--shadow-panel);
+  padding: 25px;
+  position: relative;
+  z-index: 10;
 }
 
-/* HEADER DO PAINEL */
-.rpg-header {
-    display: flex;
-    align-items: center;
-    background: linear-gradient(90deg, #240c0c 0%, #0a0404 100%);
-    border: 2px solid #4a1515;
-    border-bottom: 2px solid #802020;
-    padding: 15px 30px;
-    margin-bottom: 20px;
-    position: relative;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
-}
-
-/* ÍCONE DE JOYSTICK REALISTA CONSTRUÍDO EM CSS (SEM MOLDURA DE QUADRADINHOS) */
-.joystick-icon-rpg {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    left: 25px;
-    width: 50px;
-    height: 50px;
-    background: radial-gradient(circle at 35% 35%, #2d2d30 0%, #121214 70%);
-    border-radius: 14px;
-    border: 2px solid #d90429;
-    box-shadow: 0 0 15px rgba(217, 4, 4, 0.6), inset 0 0 8px rgba(0, 0, 0, 0.8);
-    z-index: 15;
-}
-
-/* Detalhe do D-Pad / Botões no próprio ícone digital */
-.joystick-icon-rpg::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 16px;
-    height: 16px;
-    background: #ef4444;
-    clip-path: polygon(35% 0%, 65% 0%, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0% 65%, 0% 35%, 35% 35%);
-    filter: drop-shadow(0 0 4px #ff0000);
-}
-
-/* ALINHAMENTO DO TÍTULO PRINCIPAL MEDIEVAL */
-.title-wrapper {
-    margin-left: 65px;
-}
-
-.title-wrapper h1 {
-    font-size: 26px;
-    color: #bfa15f;
-    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px rgba(191, 161, 95, 0.3);
-    letter-spacing: 2px;
-    text-transform: uppercase;
-}
-
-.title-wrapper p {
-    font-size: 12px;
-    color: #8c7676;
-    letter-spacing: 1px;
-}
-
-/* SUBTÍTULOS DAS PAINÉIS */
-.panel-labels {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    padding: 0 10px;
-}
-
-.panel-labels span {
-    font-size: 13px;
-    color: #bfa15f;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    font-weight: bold;
-}
-
-/* CORPO DA INTERFACE EM DUAS COLUNAS */
 .rpg-main-panel {
-    display: flex;
-    gap: 25px;
-    border: 2px solid #241414;
-    background-color: #080404;
-    padding: 20px;
-    box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
-    flex-wrap: wrap;
+  display: flex;
+  gap: 25px;
+  border: 2px solid #241414;
+  background-color: var(--bg-panel-dark);
+  padding: 20px;
+  box-shadow: inset 0 0 25px rgba(0, 0, 0, 0.9);
+  flex-wrap: wrap;
 }
 
 .panel-left,
 .panel-right {
-    flex: 1 1 340px;
-    display: flex;
-    flex-direction: column;
+  flex: 1 1 340px;
+  display: flex;
+  flex-direction: column;
 }
 
-/* FORMULÁRIO, INPUTS E SELETORES HORROR/FANTASY */
+/* Rótulos dos painéis */
+.panel-labels {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 10px;
+}
+
+.panel-labels span {
+  font-size: 13px;
+  color: var(--gold-primary);
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  font-weight: bold;
+}
+
+/* ===================================================================
+   5. CABEÇALHO HUD & ÍCONES CSS
+   =================================================================== */
+.rpg-header {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(90deg, #240c0c 0%, #0a0404 100%);
+  border: 2px solid #4a1515;
+  border-bottom: 2px solid #802020;
+  padding: 15px 30px;
+  margin-bottom: 20px;
+  position: relative;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+/* Ícone de Joystick estilo gótico estilizado via CSS pura */
+.joystick-icon-rpg {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  left: 25px;
+  width: 48px;
+  height: 48px;
+  background: radial-gradient(circle at 35% 35%, #2d2d30 0%, #121214 70%);
+  border-radius: 12px;
+  border: 2px solid #d90429;
+  box-shadow: 0 0 15px rgba(217, 4, 4, 0.6), inset 0 0 8px rgba(0, 0, 0, 0.8);
+  z-index: 15;
+}
+
+.joystick-icon-rpg::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
+  background: #ef4444;
+  clip-path: polygon(35% 0%, 65% 0%, 65% 35%, 100% 35%, 100% 65%, 65% 65%, 65% 100%, 35% 100%, 35% 65%, 0% 65%, 0% 35%, 35% 35%);
+  filter: drop-shadow(0 0 4px #ff0000);
+}
+
+.title-wrapper {
+  margin-left: 65px;
+}
+
+.title-wrapper h1 {
+  font-size: 26px;
+  color: var(--gold-primary);
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8), 0 0 10px var(--gold-glow);
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+.title-wrapper p {
+  font-size: 12px;
+  color: var(--text-muted);
+  letter-spacing: 1px;
+}
+
+/* ===================================================================
+   6. FORMULÁRIO & INPUTS DO HERÓI
+   =================================================================== */
 .rpg-input-group {
-    margin-bottom: 18px;
+  margin-bottom: 18px;
 }
 
 .rpg-input-group label {
-    display: block;
-    color: #8a2525;
-    font-size: 12px;
-    font-weight: bold;
-    text-transform: uppercase;
-    margin-bottom: 6px;
-    letter-spacing: 1px;
+  display: block;
+  color: #8a2525;
+  font-size: 12px;
+  font-weight: bold;
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  letter-spacing: 1px;
 }
 
 .rpg-input-group input,
 .rpg-input-group select {
-    width: 100%;
-    padding: 12px;
-    background-color: #0f0808;
-    background-image: linear-gradient(to bottom, #0f0808, #070404);
-    border: 1px solid #3d1414;
-    color: #fca5a5;
-    font-size: 14px;
-    border-radius: 3px;
-    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
-    transition: border-color 0.2s, box-shadow 0.2s;
+  width: 100%;
+  padding: 12px;
+  background-color: #0f0808;
+  background-image: linear-gradient(to bottom, #0f0808, #070404);
+  border: 1px solid #3d1414;
+  color: var(--text-highlight);
+  font-family: var(--font-rpg);
+  font-size: 14px;
+  border-radius: 3px;
+  box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.8);
+  transition: var(--transition-fast);
 }
 
 .rpg-input-group input:focus,
 .rpg-input-group select:focus {
-    outline: none;
-    border-color: #b91c1c;
-    box-shadow: 0 0 10px rgba(185, 28, 28, 0.5), inset 0 1px 3px rgba(0, 0, 0, 0.5);
+  outline: none;
+  border-color: var(--crimson-bright);
+  box-shadow: 0 0 10px rgba(185, 28, 28, 0.5), inset 0 1px 3px rgba(0, 0, 0, 0.5);
 }
 
-/* BOTÃO DE ATAQUE FORJADO EM SANGUE */
+/* Destaque visual de acessibilidade para navegação por teclado (TAB) */
+.rpg-input-group input:focus-visible,
+.rpg-input-group select:focus-visible,
+.btn-rpg-attack:focus-visible {
+  outline: 2px solid var(--gold-primary);
+  outline-offset: 2px;
+}
+
+/* ===================================================================
+   7. BOTÃO DE ATAQUE (FORJADO EM SANGUE)
+   =================================================================== */
 .btn-rpg-attack {
-    width: 100%;
-    padding: 15px;
-    background: linear-gradient(180deg, #801414 0%, #3a0505 100%);
-    color: #e2d7d7;
-    border: 2px solid #b91c1c;
-    font-size: 15px;
-    font-weight: bold;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    cursor: pointer;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.6);
-    transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(180deg, var(--crimson-blood) 0%, #3a0505 100%);
+  color: var(--text-primary);
+  border: 2px solid var(--crimson-bright);
+  font-family: var(--font-rpg);
+  font-size: 15px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  cursor: pointer;
+  box-shadow: var(--shadow-button);
+  transition: var(--transition-normal);
 }
 
 .btn-rpg-attack:hover {
-    background: linear-gradient(180deg, #b91c1c 0%, #5c0b0b 100%);
-    color: #ffffff;
-    border-color: #ef4444;
-    box-shadow: 0 0 20px rgba(239, 68, 68, 0.5);
-    letter-spacing: 3px;
+  background: linear-gradient(180deg, var(--crimson-bright) 0%, #5c0b0b 100%);
+  color: #ffffff;
+  border-color: #ef4444;
+  box-shadow: 0 0 20px var(--crimson-glow);
+  letter-spacing: 3px;
 }
 
-/* INTERFACE DO AVATAR DINÂMICO E REALISTA */
+/* ===================================================================
+   8. JANELA DO AVATAR & AMBIENTES DAS CLASSES
+   =================================================================== */
 .character-preview-window {
-    background-color: #0b0606;
-    border: 1px solid #291212;
-    height: 100%;
-    min-height: 320px;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: 15px;
-    position: relative;
-    box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
+  background-color: #0b0606;
+  border: 1px solid #291212;
+  height: 100%;
+  min-height: 320px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 15px;
+  position: relative;
+  box-shadow: inset 0 0 30px rgba(0, 0, 0, 0.9);
 }
 
-/* Janela de exibição que receberá os backgrounds temáticos das artes */
 .character-avatar-display {
-    width: 100%;
-    height: 180px;
-    background-color: #120a0a;
-    border: 2px solid #3d2525;
-    border-radius: 4px;
-    position: relative;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    box-shadow: inset 0 0 20px #000;
-    transition: all 0.4s ease;
+  width: 100%;
+  height: 180px;
+  background-color: var(--bg-card-dark);
+  border: 2px solid #3d2525;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 0 20px #000;
+  transition: all 0.4s ease;
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
-/* Sombra e iluminação dramática por trás do herói */
 .avatar-shadow {
-    position: absolute;
-    bottom: 0;
-    width: 100%;
-    height: 40px;
-    background: radial-gradient(ellipse at center, rgba(139, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
-    z-index: 1;
+  position: absolute;
+  bottom: 0;
+  width: 100%;
+  height: 40px;
+  background: radial-gradient(ellipse at center, rgba(139, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0) 70%);
+  z-index: 1;
 }
 
-/* Classes utilitárias que o JS vai injetar para mudar o visual de fundo */
+/* Classes dinâmicas injetadas pelo JS para alterar o ambiente do herói */
 .display-mago {
-    background: radial-gradient(circle, #1e1b4b 0%, #090514 100%);
-    border-color: #4338ca;
+  background-color: #090514;
+  background-image: radial-gradient(circle, #1e1b4b 0%, #090514 100%);
+  border-color: #4338ca;
+  box-shadow: inset 0 0 25px rgba(99, 102, 241, 0.3);
 }
 
-.display-guerreiro {
-    background: radial-gradient(circle, #450a0a 0%, #140505 100%);
-    border-color: #991b1b;
+.display-guerreira {
+  background-color: #140505;
+  background-image: radial-gradient(circle, #450a0a 0%, #140505 100%);
+  border-color: #991b1b;
+  box-shadow: inset 0 0 25px rgba(220, 38, 38, 0.3);
 }
 
 .display-monge {
-    background: radial-gradient(circle, #311502 0%, #0f0501 100%);
-    border-color: #9a3412;
+  background-color: #0f0501;
+  background-image: radial-gradient(circle, #311502 0%, #0f0501 100%);
+  border-color: #9a3412;
+  box-shadow: inset 0 0 25px rgba(234, 88, 12, 0.3);
 }
 
 .display-ninja {
-    background: radial-gradient(circle, #111827 0%, #030712 100%);
-    border-color: #374151;
+  background-color: #030712;
+  background-image: radial-gradient(circle, #111827 0%, #030712 100%);
+  border-color: #374151;
+  box-shadow: inset 0 0 25px rgba(75, 85, 99, 0.3);
 }
 
-/* CAIXA DE LOGS E DIÁLOGOS DE BATALHA */
+/* ===================================================================
+   9. LOG DE COMBATE
+   =================================================================== */
 .combat-log-box {
-    background-color: #040202;
-    border: 1px dashed #4a1515;
-    padding: 12px;
-    border-radius: 2px;
-    margin-top: 15px;
+  background-color: #040202;
+  border: 1px dashed #4a1515;
+  padding: 12px;
+  border-radius: 2px;
+  margin-top: 15px;
 }
 
 .log-header {
-    font-size: 11px;
-    color: #b91c1c;
-    text-transform: uppercase;
-    text-align: center;
-    margin-bottom: 8px;
-    letter-spacing: 2px;
-    font-weight: bold;
+  font-size: 11px;
+  color: var(--crimson-bright);
+  text-transform: uppercase;
+  text-align: center;
+  margin-bottom: 8px;
+  letter-spacing: 2px;
+  font-weight: bold;
 }
 
 .hero-stats-text {
-    font-size: 13px;
-    color: #8a7a7a;
-    text-align: center;
-    margin-bottom: 6px;
-    font-style: italic;
+  font-size: 13px;
+  color: #8a7a7a;
+  text-align: center;
+  margin-bottom: 6px;
+  font-style: italic;
 }
 
 .battle-text-output {
-    text-align: center;
-    min-height: 24px;
+  text-align: center;
+  min-height: 24px;
 }
 
 #out-ataque {
-    color: #d97706;
-    /* Cor âmbar de dano crítico */
-    font-size: 14px;
-    font-weight: bold;
-    letter-spacing: 0.5px;
+  color: #d97706; /* Âmbar de dano crítico */
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.5px;
 }
 
-/* =======================================================
-   ELEMENTOS DECORATIVOS HUD (BARRAS SUPERIORES E GLOBOS) 
-   ======================================================= */
+/* ===================================================================
+   10. ELEMENTOS HUD FLUTUANTES (BARRAS DE STATUS & GLOBOS)
+   =================================================================== */
 .hud-top-bar {
-    position: absolute;
-    top: 20px;
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 5;
+  position: absolute;
+  top: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  z-index: 5;
 }
 
-.left-status {
-    left: 40px;
-}
-
-.right-status {
-    right: 40px;
-}
+.left-status { left: 40px; }
+.right-status { right: 40px; }
 
 .avatar-frame {
-    width: 48px;
-    height: 48px;
-    background-color: #170d0d;
-    border: 2px solid #4a1515;
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
-    background-size: cover;
-    background-position: center;
+  width: 48px;
+  height: 48px;
+  background-color: #170d0d;
+  border: 2px solid #4a1515;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+  background-size: cover;
+  background-position: center;
 }
 
-/* Configurando fundos padrão para a barra de avatares do topo */
-.status-hero {
-    background-image: radial-gradient(#4a1515, #000);
-}
-
-.enemy-frame {
-    background-image: radial-gradient(#1e293b, #000);
-}
+.status-hero { background-image: radial-gradient(#4a1515, #000); }
+.enemy-frame { background-image: radial-gradient(#1e293b, #000); }
 
 .bar-container {
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
 }
 
-.hp-bar,
-.hp-bar-enemy,
-.mp-bar,
-.xp-bar {
-    height: 10px;
-    background-color: #140707;
-    border: 1px solid #2d0f0f;
-    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
+.hp-bar, .hp-bar-enemy, .mp-bar, .xp-bar {
+  height: 10px;
+  background-color: #140707;
+  border: 1px solid #2d0f0f;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.8);
 }
 
 .hp-bar {
-    background-image: linear-gradient(to right, #b91c1c, #7f1d1d);
-    width: 120px;
+  background-image: linear-gradient(to right, var(--crimson-bright), #7f1d1d);
+  width: 120px;
 }
 
 .hp-bar-enemy {
-    background-image: linear-gradient(to left, #dc2626, #991b1b);
-    width: 120px;
+  background-image: linear-gradient(to left, #dc2626, #991b1b);
+  width: 120px;
 }
 
 .mp-bar {
-    background-image: linear-gradient(to right, #2563eb, #1e3a8a);
-    width: 90px;
+  background-image: linear-gradient(to right, #2563eb, #1e3a8a);
+  width: 90px;
 }
 
 .xp-bar {
-    background-image: linear-gradient(to left, #7c3aed, #4c1d95);
-    width: 100px;
+  background-image: linear-gradient(to left, #7c3aed, #4c1d95);
+  width: 100px;
 }
 
-/* GLOBOS INFERIORES SANGUÍNEOS E MÍSTICOS (ORBS) */
+/* Globos Orbs de Vida e Mana */
 .orb {
-    position: absolute;
-    bottom: 20px;
-    width: 65px;
-    height: 65px;
-    border-radius: 50%;
-    border: 3px solid #241414;
-    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.9), inset -10px -10px 25px rgba(0, 0, 0, 0.8);
-    z-index: 5;
+  position: absolute;
+  bottom: 20px;
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  border: 3px solid #241414;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.9), inset -10px -10px 25px rgba(0, 0, 0, 0.8);
+  z-index: 5;
 }
 
 .life-orb {
-    left: 40px;
-    background: radial-gradient(circle at 35% 35%, #ef4444 0%, #7f1d1d 60%, #220303 100%);
-    box-shadow: 0 0 25px rgba(239, 68, 68, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2);
+  left: 40px;
+  background: radial-gradient(circle at 35% 35%, #ef4444 0%, #7f1d1d 60%, #220303 100%);
+  box-shadow: 0 0 25px rgba(239, 68, 68, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2);
 }
 
 .mana-orb {
-    right: 40px;
-    background: radial-gradient(circle at 35% 35%, #3b82f6 0%, #1d4ed8 60%, #030712 100%);
-    box-shadow: 0 0 25px rgba(59, 130, 246, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2);
+  right: 40px;
+  background: radial-gradient(circle at 35% 35%, #3b82f6 0%, #1d4ed8 60%, #030712 100%);
+  box-shadow: 0 0 25px rgba(59, 130, 246, 0.35), inset 0 0 10px rgba(255, 255, 255, 0.2);
 }
-/* =======================================================
-   REGRAS DE RESPONSIVIDADE (PARA CELULARES E TABLETS)
-   ======================================================= */
+
+/* ===================================================================
+   11. RESPONSIVIDADE & MEDIA QUERIES
+   =================================================================== */
 @media (max-width: 768px) {
-    
-    /* Permite que a página role verticalmente se o conteúdo crescer */
-    body {
-        overflow-y: auto;
-        padding: 10px;
-        align-items: flex-start; /* Evita que o conteúdo quebre no topo */
-    }
+  body {
+    padding: 10px;
+    align-items: flex-start;
+  }
 
-    /* Reduz o espaçamento da moldura principal */
-    .rpg-container {
-        padding: 15px;
-        margin-top: 80px; /* Dá espaço para as barras de status superiores */
-        margin-bottom: 90px; /* Dá espaço para os globos inferiores */
-    }
+  .rpg-container {
+    padding: 15px;
+    margin-top: 80px;
+    margin-bottom: 90px;
+  }
 
-    /* Reajusta o cabeçalho para telas menores */
-    .rpg-header {
-        flex-direction: column;
-        text-align: center;
-        padding: 15px;
-    }
+  .rpg-header {
+    flex-direction: column;
+    text-align: center;
+    padding: 15px;
+  }
 
-    /* Move o ícone digital do joystick para o topo do título */
-    .joystick-icon-rpg {
-        position: relative;
-        transform: none;
-        top: 0;
-        left: 0;
-        margin-bottom: 10px;
-    }
+  .joystick-icon-rpg {
+    position: relative;
+    transform: none;
+    top: 0;
+    left: 0;
+    margin-bottom: 10px;
+  }
 
-    /* Remove a margem lateral do texto já que o ícone mudou de lugar */
-    .title-wrapper {
-        margin-left: 0;
-    }
+  .title-wrapper {
+    margin-left: 0;
+  }
 
-    .title-wrapper h1 {
-        font-size: 20px;
-    }
+  .title-wrapper h1 {
+    font-size: 20px;
+  }
 
-    /* Ajusta as etiquetas das colunas para sumirem ou empilharem */
-    .panel-labels {
-        display: none; /* Em telas móveis, rótulos lado a lado perdem o sentido */
-    }
+  .panel-labels {
+    display: none;
+  }
 
-    /* Reduz o tamanho das barras superiores do HUD para não sumirem da tela */
-    .hud-top-bar {
-        scale: 0.85; /* Encolhe proporcionalmente as barras */
-    }
-    .left-status { left: 10px; }
-    .right-status { right: 10px; }
+  .hud-top-bar {
+    transform: scale(0.85);
+  }
+  .left-status { left: 5px; }
+  .right-status { right: 5px; }
 
-    /* Reposiciona os globos (orbs) de vida e mana fixos nos cantos de baixo */
-    .orb {
-        width: 55px;
-        height: 55px;
-        position: fixed; /* Mantém fixo na tela estilo mobile game */
-        bottom: 15px;
-    }
-    .life-orb { left: 15px; }
-    .mana-orb { right: 15px; }
+  .orb {
+    width: 50px;
+    height: 50px;
+    position: fixed;
+    bottom: 15px;
+  }
+  .life-orb { left: 15px; }
+  .mana-orb { right: 15px; }
+}
+
+/* ===================================================================
+   12. PREFERÊNCIAS DE ACESSIBILIDADE
+   =================================================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
