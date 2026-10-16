@@ -1,100 +1,148 @@
 <!DOCTYPE html>
+<!-- 
+  MELHORIA: Atributo lang definido explicitamente para "pt-BR".
+  Garante interpretação correta por leitores de tela e motores de busca.
+-->
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- MELHORIA DE SEO & METADADOS -->
+    <meta name="description" content="Criador de Heróis - Painel interativo de criação de personagens e simulação de combate RPG em estilo Dark Fantasy.">
+    <meta name="theme-color" content="#0a0a0f">
+    
+    <!-- Meta tags Open Graph para compartilhamento em redes sociais -->
+    <meta property="og:title" content="Criador de Heróis - RPG Interface">
+    <meta property="og:description" content="Painel de controle de combate e criação de heróis para RPG.">
+    <meta property="og:type" content="website">
+
     <title>Criador de Heróis - RPG Interface</title>
+
+    <!-- 
+      MELHORIA DE PERFORMANCE: Preconnect para acelerar o carregamento da fonte externa 'Cinzel',
+      reduzindo a latência do Google Fonts e evitando oscilações no layout (CLS).
+    -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+
+    <!-- Estilização CSS unificada -->
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <div class="hud-top-bar left-status">
-        <div class="avatar-frame status-hero"></div>
+    <!-- 
+      HUD TOP BAR (Status Global de Combate)
+      MELHORIA A11Y: Adicionados papéis 'progressbar' e rótulos ARIA para leitores de tela.
+    -->
+    <aside class="hud-top-bar left-status" aria-label="Status do Herói">
+        <div class="avatar-frame status-hero" role="img" aria-label="Avatar do Herói"></div>
         <div class="bar-container">
-            <div class="hp-bar"></div>
-            <div class="mp-bar"></div>
+            <div class="hp-bar" role="progressbar" aria-label="Pontos de Vida do Herói" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="mp-bar" role="progressbar" aria-label="Pontos de Mana do Herói" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
-    </div>
+    </aside>
 
-    <div class="hud-top-bar right-status">
+    <aside class="hud-top-bar right-status" aria-label="Status do Inimigo">
         <div class="bar-container">
-            <div class="hp-bar-enemy"></div>
-            <div class="xp-bar"></div>
+            <div class="hp-bar-enemy" role="progressbar" aria-label="Pontos de Vida do Inimigo" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+            <div class="xp-bar" role="progressbar" aria-label="Progresso de Experiência" aria-valuenow="45" aria-valuemin="0" aria-valuemax="100"></div>
         </div>
-        <div class="avatar-frame enemy-frame"></div>
-    </div>
+        <div class="avatar-frame enemy-frame" role="img" aria-label="Avatar do Inimigo"></div>
+    </aside>
 
-    <div class="rpg-container">
+    <!-- 
+      MELHORIA SEMÂNTICA: O painel principal foi envolvido na tag <main>.
+      Permite navegação direta por atalhos de acessibilidade no teclado.
+    -->
+    <main class="rpg-container">
         
         <header class="rpg-header">
-            <div class="joystick-icon-rpg"></div>
+            <div class="joystick-icon-rpg" aria-hidden="true"></div>
             <div class="title-wrapper">
                 <h1>Criador de Heróis</h1>
                 <p>Painel de Controle de Combate</p>
             </div>
         </header>
 
-        <div class="panel-labels">
+        <div class="panel-labels" aria-hidden="true">
             <span class="label-left">Dados do Herói</span>
             <span class="label-right">Visualização & Batalha</span>
         </div>
 
         <div class="rpg-main-panel">
             
-            <section class="panel-left">
-                <form id="hero-form">
+            <!-- Formulário de Entrada do Herói -->
+            <section class="panel-left" aria-labelledby="form-hero-title">
+                <h2 id="form-hero-title" class="sr-only">Atributos do Personagem</h2>
+                
+                <form id="hero-form" novalidate>
                     <div class="rpg-input-group">
                         <label for="nome">Nome do Herói:</label>
-                        <input type="text" id="nome" placeholder="Ex: Arathorn" required>
+                        <input type="text" id="nome" name="nome" placeholder="Ex: Arathorn" required maxlength="30" autocomplete="off">
                     </div>
 
                     <div class="rpg-input-row">
                         <div class="rpg-input-group half-width">
                             <label for="idade">Idade:</label>
-                            <input type="number" id="idade" value="25" required min="1">
+                            <input type="number" id="idade" name="idade" value="25" required min="1" max="999">
                         </div>
                     </div>
 
-<div class="rpg-input-group">
-    <label for="tipo">Classe / Tipo:</label>
-    <select id="tipo" required>
-        <option value="" disabled selected>Escolha sua classe...</option>
-        
-        <option value="mago.png">🧙‍♂️ Mago Celestial</option>
-        <option value="guerreira.png">⚔️ Guerreira (Espadas Gêmeas)</option>
-        <option value="monge.png">🧘‍♂️ Monge Espiritual</option>
-        <option value="ninja.png">🥷 Ninja das Sombras</option>
-        
-    </select>
-</div>
-                    <button type="submit" class="btn-rpg-attack">Comandar Ataque</button>
+                    <!-- 
+                      MELHORIA DE ARQUITETURA DE DADOS: 
+                      Substituídos os caminhos de arquivo (.png) no value por identificadores limpos
+                      ('mago', 'guerreira', etc.). O vínculo com a imagem é feito no JS ou CSS.
+                    -->
+                    <div class="rpg-input-group">
+                        <label for="tipo">Classe / Tipo:</label>
+                        <select id="tipo" name="tipo" required>
+                            <option value="" disabled selected>Escolha sua classe...</option>
+                            <option value="mago">🧙‍♂️ Mago Celestial</option>
+                            <option value="guerreira">⚔️ Guerreira (Espadas Gêmeas)</option>
+                            <option value="monge">🧘‍♂️ Monge Espiritual</option>
+                            <option value="ninja">🥷 Ninja das Sombras</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="btn-rpg-attack" id="btn-attack">Comandar Ataque</button>
                 </form>
             </section>
 
-            <section class="panel-right">
+            <!-- Painel de Visualização & Log de Combate -->
+            <section class="panel-right" aria-label="Visualização e Log de Combate">
                 <div class="character-preview-window">
                     
-                    <div class="character-avatar-display" id="char-avatar">
-                        <div class="avatar-shadow"></div>
+                    <div class="character-avatar-display" id="char-avatar" aria-live="polite">
+                        <div class="avatar-shadow" aria-hidden="true"></div>
                     </div>
                     
-                    <div class="combat-log-box" id="result-box">
+                    <!-- 
+                      MELHORIA A11Y: Adicionado aria-live="polite" para que o leitor de tela
+                      anuncie novos eventos de combate no momento em que forem disparados.
+                    -->
+                    <div class="combat-log-box" id="result-box" aria-live="polite">
                         <div class="log-header">Log de Combate</div>
-                        <p class="hero-stats-text"><span id="out-nome">Aventureiro</span>, <span id="out-idade">?</span> anos</p>
+                        <p class="hero-stats-text">
+                            <span id="out-nome">Aventureiro</span>, <span id="out-idade">?</span> anos
+                        </p>
                         <div class="battle-text-output">
                             <p id="out-ataque">Aguardando ordens no painel de controle...</p>
                         </div>
                     </div>
+
                 </div>
             </section>
 
         </div>
-    </div>
+    </main>
 
-    <div class="orb life-orb"></div>
-    <div class="orb mana-orb"></div>
+    <!-- Elementos visuais decorativos (Ocultados para leitores de tela) -->
+    <div class="orb life-orb" aria-hidden="true"></div>
+    <div class="orb mana-orb" aria-hidden="true"></div>
 
+    <!-- Script de lógica de combate e animações do RPG -->
     <script src="script.js"></script>
 </body>
 </html>
